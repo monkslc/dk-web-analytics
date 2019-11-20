@@ -1,6 +1,10 @@
 const kafka = require('kafka-node');
 const uuid = require('uuid');
 
+console.log('\n\n\n\n\n\n\n\n\n')
+console.log('STARTING SERVICE AT TIME:' , new Date())
+console.log('\n\n\n\n\n\n\n\n\n')
+
 let lastImpressionId = uuid.v4()
 
 const userIds = [uuid.v4(), uuid.v4(), uuid.v4(), uuid.v4()]
@@ -56,6 +60,7 @@ function produceEvent() {
 }
 
 const HighLevelProducer = kafka.HighLevelProducer;
+const Consumer = kafka.Consumer;
 const client = new kafka.KafkaClient({
 	kafkaHost: 'kafka:9092'
 });
@@ -71,3 +76,20 @@ producer.on('error', function(err) {
 	console.log('we done errored');
 	throw err;
 });
+
+setTimeout(() => {
+const consumer = new Consumer(
+	client,
+	[{topic: 'impressions'}]
+);
+
+consumer.on('message', (msg) => {
+	console.log('Hey, we received a message from kafka')
+	console.log(msg)
+})
+
+consumer.on('error', (err) => {
+	console.log('Hey, we received an error from kafka')
+	console.log(err)
+})
+}, 3000)
