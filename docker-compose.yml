@@ -1,9 +1,10 @@
 version: '3'
 services:
-  p5:
+  node-producer:
     build: ./node-service
     depends_on:
         - kafka
+        - redis
   druid:
     build: ./druid-service
     ports:
@@ -17,4 +18,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_BOB://kafka:29092,LISTENER_FRED://localhost:9092,LISTENER_ALICE://never-gonna-give-you-up:29094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_BOB:PLAINTEXT,LISTENER_FRED:PLAINTEXT,LISTENER_ALICE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_BOB
+  redis:
+    image: redis:5.0.6
+    ports:
+      - "6379:6379"
 

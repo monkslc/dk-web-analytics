@@ -77,6 +77,7 @@ producer.on('error', function(err) {
 	throw err;
 });
 
+// CONSUMER
 setTimeout(() => {
 const consumer = new Consumer(
 	client,
@@ -93,3 +94,28 @@ consumer.on('error', (err) => {
 	console.log(err)
 })
 }, 3000)
+
+// REDIS
+const redis = require("redis")
+
+const redisClient = redis.createClient({
+	host: 'redis',
+	port: '6379'
+})
+
+setTimeout(() => {
+	redisClient.get("testing", (err, resp) => {
+		console.log('\n\n\n\n\n')
+		console.log("REDIS TESTING")
+		console.log(resp)
+		console.log('\n\n\n\n\n')
+	})
+}, 5000)
+redisClient.set("testing", "test")
+
+redisClient.on('error', (err) => {
+	console.log('\n\n\n\n\n')
+	console.log('REDIS ERROR')
+	console.log(err)
+	console.log('\n\n\n\n\n')
+})
