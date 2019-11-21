@@ -67,12 +67,12 @@ const client = new kafka.KafkaClient({
 const producer = new HighLevelProducer(client);
 
 producer.on('ready', async function() {
-	producer.createTopics(['impressions','click-events'], true, function (err, data) {
+	producer.createTopics(['impressions','click-events', 'populated-click-events'], true, function (err, data) {
 		//console.log(err)
    		//console.log(data);
 		const consumer = new Consumer(
 			client,
-			[{topic: 'click-events'}, {topic: 'impressions'}, {topic: 'populated-click-event'}]
+			[{topic: 'click-events'}, {topic: 'impressions'}, {topic: 'populated-click-events'}]
 		);
 
 		consumer.on('message', (msg) => {
@@ -84,6 +84,9 @@ producer.on('ready', async function() {
 				handleClickEvent(event)
 			} else if (msg.topic === 'impressions') {
 				handleImpressionEvent(event)
+			} else if (msg.topic === 'populated-click-events') {
+				console.log('hey, populated click event is working')
+				console.log(msg)
 			}
 		})
 
@@ -122,6 +125,21 @@ function handleClickEvent(clickEvent) {
 			...clickEvent,
 			...resp			
 		}
+		lastImpressionId = uuid.v4()
+		let payloads = [{
+			topic: 'populated-click-events',
+			messages: JSON.stringify(populatedClickEvent)
+		}]
+
+    producer.send(payloads, (err, data) => {
+      if (err) {
+        console.log('We fucked up secind the payload');
+		console.log(err);
+      } else {
+        //console.log('Data sent');
+        //console.log(data);
+      }
+    });
 	})
 }
 
